@@ -207,10 +207,18 @@ class CallTracker {
         </div>
         <div class="contact-actions">
           ${callCount > 0 ? `<span class="contact-call-count">${callCount}× today</span>` : ''}
-          ${telHref ? `<a href="${telHref}" class="contact-phone-link">${this._esc(contact.phone)}</a>` : ''}
+          ${telHref ? `<a href="${telHref}" class="contact-phone-link" data-id="${contact.id}">${this._esc(contact.phone)}</a>` : ''}
           <button class="btn-log-contact" data-id="${contact.id}">Log Call</button>
         </div>
       `;
+
+      if (telHref) {
+        item.querySelector('.contact-phone-link').addEventListener('click', (e) => {
+          e.preventDefault();
+          this.logCallFromContact(contact);
+          window.location.href = telHref;
+        });
+      }
 
       item.querySelector('.btn-log-contact').addEventListener('click', () => {
         this.logCallFromContact(contact);

@@ -59,6 +59,7 @@ header {
   box-shadow: var(--shadow);
 }
 header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+header h1 .ph { vertical-align: -0.125em; margin-right: 0.25em; }
 .subtitle { font-size: 1rem; opacity: 0.85; }
 
 /* ── Sheet Label Bar ────────────────────────────────── */
@@ -372,8 +373,17 @@ input[type="date"]:focus { outline: none; border-color: var(--blue); }
   font-size: 0.88rem;
   font-weight: 500;
   white-space: nowrap;
+  cursor: pointer;
+  padding: 0.25rem 0.35rem;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  display: inline-block;
 }
-.contact-phone-link:hover { color: var(--sky); text-decoration: underline; }
+.contact-phone-link:hover {
+  color: var(--crust);
+  background: var(--sky);
+  text-decoration: none;
+}
 
 .contact-call-count {
   font-size: 0.75rem;
