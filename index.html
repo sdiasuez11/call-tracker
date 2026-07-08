@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Call Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📞 Call Tracker</h1>
+      <p class="subtitle">Track your phone calls throughout the day</p>
+    </header>
+
+    <!-- Sheet Label Bar (day view only) -->
+    <div class="sheet-label-section" id="sheetLabelSection">
+      <label for="sheetLabel">Call Sheet</label>
+      <input type="text" id="sheetLabel" placeholder="Name today's call sheet..." autocomplete="off" maxlength="100">
+    </div>
+
+    <main>
+      <!-- Log Calls -->
+      <section class="input-section">
+        <div class="button-group">
+          <button id="logCallBtn" class="btn btn-primary">Log Call Now</button>
+          <button id="manualBtn" class="btn btn-secondary">Manual Time</button>
+        </div>
+        <div id="manualInput" class="manual-input hidden">
+          <input type="datetime-local" id="manualTime">
+          <button id="saveManualBtn" class="btn btn-sm btn-success">Save</button>
+          <button id="cancelManualBtn" class="btn btn-sm btn-secondary">Cancel</button>
+        </div>
+      </section>
+
+      <!-- Contact Sheet -->
+      <section class="contact-sheet-section">
+        <div class="section-header">
+          <h2>Contact Sheet</h2>
+          <span id="contactCount" class="contact-count"></span>
+        </div>
+
+        <!-- Shown when no contacts are loaded -->
+        <div id="contactUploadArea" class="contact-upload-area">
+          <p>Upload a CSV file to load your contact sheet</p>
+          <label for="csvUpload" class="btn btn-secondary">Upload CSV</label>
+          <input type="file" id="csvUpload" accept=".csv" style="display:none">
+          <p class="upload-hint">Detected columns: Name (or First + Last), Phone, Job Title, Company, LinkedIn</p>
+        </div>
+
+        <!-- Shown when contacts are loaded -->
+        <div id="contactPanel" class="contact-panel hidden">
+          <div class="contact-controls">
+            <input type="text" id="contactSearch" class="contact-search" placeholder="Search by name, company, or title...">
+            <label for="csvUpload" class="btn btn-sm btn-secondary">Replace CSV</label>
+            <button id="clearContactsBtn" class="btn btn-sm btn-danger">Clear Sheet</button>
+          </div>
+          <div id="contactList" class="contact-list"></div>
+        </div>
+      </section>
+
+      <!-- View Selector -->
+      <section class="view-selector">
+        <button id="viewDayBtn" class="view-btn active" data-view="day">Today</button>
+        <button id="viewWeekBtn" class="view-btn" data-view="week">This Week</button>
+        <button id="viewAllBtn" class="view-btn" data-view="all">All Time</button>
+        <input type="date" id="dateSelector" class="date-input">
+      </section>
+
+      <!-- Stats -->
+      <section class="stats-section">
+        <div class="stat-card">
+          <div class="stat-label">Total Calls</div>
+          <div class="stat-value" id="totalCalls">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Peak Hour</div>
+          <div class="stat-value" id="peakHour">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg / Hour</div>
+          <div class="stat-value" id="avgPerHour">0</div>
+        </div>
+      </section>
+
+      <!-- Chart -->
+      <section class="chart-section">
+        <h2>Calls Per Hour</h2>
+        <canvas id="hourlyChart" height="50"></canvas>
+      </section>
+
+      <!-- Hourly Table -->
+      <section class="table-section">
+        <h2>Hourly Breakdown</h2>
+        <table id="hourlyTable" class="data-table">
+          <thead>
+            <tr><th>Hour</th><th>Calls</th></tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </section>
+
+      <!-- Logged Calls -->
+      <section class="calls-section">
+        <div class="section-header">
+          <h2>Logged Calls</h2>
+          <span id="callCount" class="call-count">0 calls</span>
+        </div>
+        <div id="callsList" class="calls-list">
+          <p class="empty-state">No calls logged yet. Click "Log Call Now" to start.</p>
+        </div>
+      </section>
+
+      <!-- Export -->
+      <section class="export-section">
+        <h2>Export Data</h2>
+        <div class="button-group">
+          <button id="exportCsvBtn" class="btn btn-secondary">Download CSV</button>
+          <button id="exportJsonBtn" class="btn btn-secondary">Download JSON</button>
+          <button id="clearDataBtn" class="btn btn-danger">Clear All Data</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Call Tracker — Local storage only, data never leaves your device</p>
+    </footer>
+  </div>
+
+  <script src="storage.js"></script>
+  <script src="export.js"></script>
+  <script src="charts.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
