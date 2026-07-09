@@ -1,5 +1,5 @@
 :root {
-  /* Catppuccin Mocha */
+  /* Catppuccin Mocha (dark theme) */
   --crust:     #11111b;
   --mantle:    #181825;
   --base:      #1e1e2e;
@@ -29,6 +29,39 @@
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   --radius: 8px;
   --spacing: 1rem;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    /* Catppuccin Latte (light theme) */
+    --crust:     #dce0e8;
+    --mantle:    #e6e9f0;
+    --base:      #eff1f5;
+    --surface0:  #e8e9ed;
+    --surface1:  #dce1e8;
+    --surface2:  #cdd1dc;
+    --overlay0:  #b9bfca;
+    --overlay1:  #b5b9c0;
+    --overlay2:  #a5a9b0;
+    --subtext0:  #8c8fa1;
+    --subtext1:  #7c7f88;
+    --text:      #4c4f69;
+    --lavender:  #7287fd;
+    --blue:      #1e66f5;
+    --sapphire:  #209fb1;
+    --sky:       #04a5e5;
+    --teal:      #0d8f7d;
+    --green:     #40a02b;
+    --yellow:    #df8e1d;
+    --peach:     #fe640b;
+    --maroon:    #e64553;
+    --red:       #d20f39;
+    --mauve:     #8839ef;
+    --pink:      #ea76cb;
+    --rosewater: #f2cecf;
+
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -159,6 +192,29 @@ section h2 { font-size: 1.25rem; margin-bottom: 1rem; color: var(--text); }
 .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.85rem; }
 
 .button-group { display: flex; gap: var(--spacing); flex-wrap: wrap; align-items: center; }
+
+/* ── Focus-Visible (Keyboard Navigation) ───────────────── */
+button:focus-visible,
+input:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* Reduce outline offset for small elements */
+.btn-sm:focus-visible {
+  outline-offset: 1px;
+}
+
+/* Input focus-visible (already has border, add outline for double indication) */
+input[type="datetime-local"]:focus-visible,
+input[type="date"]:focus-visible,
+input[type="text"]:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-color: var(--blue);
+}
 
 /* ── Input Section ──────────────────────────────────── */
 .input-section { text-align: center; }
