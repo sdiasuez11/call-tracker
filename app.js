@@ -1,11 +1,108 @@
 // Main application logic for call tracker
 
+// Modal Manager for accessible dialogs
+class ModalManager {
+  constructor() {
+    this.overlay = document.getElementById('modalOverlay');
+    this.modal = document.querySelector('.modal');
+    this.title = document.getElementById('modalTitle');
+    this.message = document.getElementById('modalMessage');
+    this.input = document.getElementById('modalInput');
+    this.confirmBtn = document.getElementById('modalConfirm');
+    this.cancelBtn = document.getElementById('modalCancel');
+    this.closeBtn = document.getElementById('modalClose');
+
+    this.confirmCallback = null;
+    this.cancelCallback = null;
+    this.previousFocus = null;
+
+    this.setupEventListeners();
+  }
+
+  setupEventListeners() {
+    this.confirmBtn.addEventListener('click', () => this.confirm());
+    this.cancelBtn.addEventListener('click', () => this.cancel());
+    this.closeBtn.addEventListener('click', () => this.cancel());
+    this.overlay.addEventListener('click', (e) => {
+      if (e.target === this.overlay) this.cancel();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!this.overlay.classList.contains('active')) return;
+      if (e.key === 'Escape') this.cancel();
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.confirm();
+      }
+    });
+  }
+
+  show(options = {}) {
+    const {
+      title = 'Confirm',
+      message = '',
+      confirmText = 'Confirm',
+      cancelText = 'Cancel',
+      showInput = false,
+      inputValue = '',
+      inputPlaceholder = '',
+      onConfirm = null,
+      onCancel = null
+    } = options;
+
+    this.title.textContent = title;
+    this.message.textContent = message;
+    this.confirmBtn.textContent = confirmText;
+    this.cancelBtn.textContent = cancelText;
+
+    if (showInput) {
+      this.input.style.display = 'block';
+      this.input.value = inputValue;
+      this.input.placeholder = inputPlaceholder;
+    } else {
+      this.input.style.display = 'none';
+    }
+
+    this.confirmCallback = onConfirm;
+    this.cancelCallback = onCancel;
+
+    this.previousFocus = document.activeElement;
+    this.overlay.classList.add('active');
+    this.overlay.setAttribute('aria-hidden', 'false');
+
+    // Focus the input if shown, otherwise focus confirm button
+    if (showInput) {
+      setTimeout(() => this.input.focus(), 100);
+    } else {
+      setTimeout(() => this.confirmBtn.focus(), 100);
+    }
+  }
+
+  confirm() {
+    const value = this.input.style.display === 'block' ? this.input.value : null;
+    this.hide();
+    if (this.confirmCallback) this.confirmCallback(value);
+  }
+
+  cancel() {
+    this.hide();
+    if (this.cancelCallback) this.cancelCallback();
+  }
+
+  hide() {
+    this.overlay.classList.remove('active');
+    this.overlay.setAttribute('aria-hidden', 'true');
+    if (this.previousFocus) this.previousFocus.focus();
+  }
+}
+
 class CallTracker {
   constructor() {
     this.currentView   = 'day';
     this.selectedDate  = new Date();
     this.editingCallId = null;
     this.contactFilter = '';
+    this.modal = new ModalManager();
     this.init();
   }
 
@@ -19,7 +116,8 @@ class CallTracker {
       const active = document.activeElement;
       const isTyping = active === this.sheetLabelInput || active === this.contactSearch ||
                        active === this.manualTime || active.tagName === 'INPUT';
-      if (e.key === 'Enter' && !this.editingCallId && !isTyping) {
+      const modalOpen = document.getElementById('modalOverlay').classList.contains('active');
+      if (e.key === 'Enter' && !this.editingCallId && !isTyping && !modalOpen) {
         this.logCall();
       }
     });
@@ -101,11 +199,17 @@ class CallTracker {
 
     // Clear contacts
     this.clearContactsBtn.addEventListener('click', () => {
-      if (confirm('Clear the contact sheet? Logged calls will not be affected.')) {
-        Storage.clearContacts();
-        this.contactFilter = '';
-        this.loadContacts();
-      }
+      this.modal.show({
+        title: 'Clear Contact Sheet',
+        message: 'Clear the contact sheet? Logged calls will not be affected.',
+        confirmText: 'Clear',
+        cancelText: 'Cancel',
+        onConfirm: () => {
+          Storage.clearContacts();
+          this.contactFilter = '';
+          this.loadContacts();
+        }
+      });
     });
   }
 
@@ -378,34 +482,65 @@ class CallTracker {
   }
 
   editCall(callId, currentTimestamp) {
-    const newTimestamp = prompt('Enter new time:', currentTimestamp.slice(0, 16));
-    if (newTimestamp) {
-      try {
-        const date = new Date(newTimestamp);
-        if (isNaN(date.getTime())) { alert('Invalid date/time format'); return; }
-        Storage.updateCall(callId, date.toISOString());
-        this.render();
-      } catch (e) {
-        alert('Error updating call: ' + e.message);
+    this.modal.show({
+      title: 'Edit Call Time',
+      message: 'Enter the new date and time for this call:',
+      confirmText: 'Update',
+      cancelText: 'Cancel',
+      showInput: true,
+      inputValue: currentTimestamp.slice(0, 16),
+      inputPlaceholder: 'YYYY-MM-DDTHH:mm',
+      onConfirm: (newTimestamp) => {
+        if (!newTimestamp) return;
+        try {
+          const date = new Date(newTimestamp);
+          if (isNaN(date.getTime())) {
+            alert('Invalid date/time format. Please use YYYY-MM-DDTHH:mm');
+            return;
+          }
+          Storage.updateCall(callId, date.toISOString());
+          this.render();
+        } catch (e) {
+          alert('Error updating call: ' + e.message);
+        }
       }
-    }
+    });
   }
 
   deleteCall(callId) {
-    if (confirm('Delete this call?')) {
-      Storage.deleteCall(callId);
-      this.render();
-    }
+    this.modal.show({
+      title: 'Delete Call',
+      message: 'Delete this call? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      onConfirm: () => {
+        Storage.deleteCall(callId);
+        this.render();
+      }
+    });
   }
 
   clearAllData() {
-    if (confirm('Delete all calls? This cannot be undone.')) {
-      if (confirm('Are you absolutely sure? This will permanently delete all data.')) {
-        Storage.clear();
-        this.loadContacts();
-        this.render();
+    this.modal.show({
+      title: 'Clear All Data',
+      message: 'Delete all calls? This cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      onConfirm: () => {
+        // Show second confirmation
+        this.modal.show({
+          title: 'Confirm Deletion',
+          message: 'Are you absolutely sure? This will permanently delete all data.',
+          confirmText: 'Yes, Delete All',
+          cancelText: 'Cancel',
+          onConfirm: () => {
+            Storage.clear();
+            this.loadContacts();
+            this.render();
+          }
+        });
       }
-    }
+    });
   }
 
   updateDateSelector() {

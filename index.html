@@ -42,8 +42,20 @@
           <span id="contactCount" class="contact-count"></span>
         </div>
 
+        <!-- Loading skeleton for CSV upload -->
+        <div id="contactLoadingSkeleton" class="contact-loading-skeleton hidden">
+          <div class="skeleton-line skeleton-w-40"></div>
+          <div style="margin-top: 0.75rem;">
+            <div class="skeleton-item"></div>
+            <div class="skeleton-item" style="margin-top: 0.5rem;"></div>
+          </div>
+        </div>
+
         <!-- Shown when no contacts are loaded -->
         <div id="contactUploadArea" class="contact-upload-area">
+          <div class="empty-state-icon">
+            <i class="ph ph-contact"></i>
+          </div>
           <p>Upload a CSV file to load your contact sheet</p>
           <label for="csvUpload" class="btn btn-secondary">Upload CSV</label>
           <input type="file" id="csvUpload" accept=".csv" style="display:none">
@@ -88,18 +100,50 @@
       <!-- Chart -->
       <section class="chart-section">
         <h2>Calls Per Hour</h2>
-        <canvas id="hourlyChart" height="50"></canvas>
+        <!-- Loading skeleton -->
+        <div id="chartLoadingSkeleton" class="chart-loading-skeleton hidden">
+          <div class="chart-skeleton-bars">
+            <div class="skeleton-bar"></div>
+            <div class="skeleton-bar"></div>
+            <div class="skeleton-bar"></div>
+            <div class="skeleton-bar"></div>
+            <div class="skeleton-bar"></div>
+            <div class="skeleton-bar"></div>
+          </div>
+        </div>
+        <!-- Actual chart -->
+        <div id="chartContainer" class="chart-container">
+          <canvas id="hourlyChart" height="50"></canvas>
+        </div>
       </section>
 
       <!-- Hourly Table -->
       <section class="table-section">
         <h2>Hourly Breakdown</h2>
-        <table id="hourlyTable" class="data-table">
-          <thead>
-            <tr><th>Hour</th><th>Calls</th></tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
+        <!-- Loading skeleton -->
+        <div id="tableLoadingSkeleton" class="table-loading-skeleton hidden">
+          <div class="skeleton-table-row">
+            <div class="skeleton-cell"></div>
+            <div class="skeleton-cell"></div>
+          </div>
+          <div class="skeleton-table-row">
+            <div class="skeleton-cell"></div>
+            <div class="skeleton-cell"></div>
+          </div>
+          <div class="skeleton-table-row">
+            <div class="skeleton-cell"></div>
+            <div class="skeleton-cell"></div>
+          </div>
+        </div>
+        <!-- Actual table -->
+        <div id="tableContainer">
+          <table id="hourlyTable" class="data-table">
+            <thead>
+              <tr><th>Hour</th><th>Calls</th></tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
       </section>
 
       <!-- Logged Calls -->
@@ -108,8 +152,21 @@
           <h2>Logged Calls</h2>
           <span id="callCount" class="call-count">0 calls</span>
         </div>
+        <!-- Loading skeleton -->
+        <div id="callsLoadingSkeleton" class="calls-loading-skeleton hidden">
+          <div class="skeleton-call-item"></div>
+          <div class="skeleton-call-item" style="margin-top: 0.75rem;"></div>
+          <div class="skeleton-call-item" style="margin-top: 0.75rem;"></div>
+        </div>
+        <!-- Actual calls list -->
         <div id="callsList" class="calls-list">
-          <p class="empty-state">No calls logged yet. Click "Log Call Now" to start.</p>
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <i class="ph ph-phone-slash"></i>
+            </div>
+            <p>No calls logged yet</p>
+            <p class="empty-state-hint">Click "Log Call Now" to start tracking</p>
+          </div>
         </div>
       </section>
 
@@ -127,6 +184,29 @@
     <footer>
       <p>Call Tracker — Local storage only, data never leaves your device</p>
     </footer>
+  </div>
+
+  <!-- Modal Dialog -->
+  <div id="modalOverlay" class="modal-overlay" role="presentation" aria-hidden="true">
+    <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h2 id="modalTitle"></h2>
+        <button id="modalClose" class="modal-close-btn" aria-label="Close dialog" type="button">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modalMessage"></p>
+        <input id="modalInput" type="text" class="modal-input" style="display:none" />
+      </div>
+      <div class="modal-buttons">
+        <button id="modalCancel" class="btn btn-secondary" type="button">Cancel</button>
+        <button id="modalConfirm" class="btn btn-primary" type="button">Confirm</button>
+      </div>
+    </div>
   </div>
 
   <script src="storage.js"></script>
