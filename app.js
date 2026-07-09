@@ -159,6 +159,14 @@ class CallTracker {
     this.contactList       = document.getElementById('contactList');
     this.contactCountEl    = document.getElementById('contactCount');
     this.clearContactsBtn  = document.getElementById('clearContactsBtn');
+
+    // Loading skeleton elements
+    this.contactLoadingSkeleton = document.getElementById('contactLoadingSkeleton');
+    this.chartLoadingSkeleton   = document.getElementById('chartLoadingSkeleton');
+    this.chartContainer         = document.getElementById('chartContainer');
+    this.tableLoadingSkeleton   = document.getElementById('tableLoadingSkeleton');
+    this.tableContainer         = document.getElementById('tableContainer');
+    this.callsLoadingSkeleton   = document.getElementById('callsLoadingSkeleton');
   }
 
   attachEventListeners() {
@@ -234,16 +242,30 @@ class CallTracker {
     const file = e.target.files[0];
     if (!file) return;
 
+    // Show loading state
+    this.contactUploadArea.classList.add('hidden');
+    this.contactLoadingSkeleton.classList.remove('hidden');
+    this.contactPanel.classList.add('hidden');
+
     Export.parseContactsCSV(file)
       .then(contacts => {
         Storage.setContacts(contacts);
         this.contactFilter        = '';
         this.contactSearch.value  = '';
+        this.contactLoadingSkeleton.classList.add('hidden');
         this.loadContacts();
         e.target.value = ''; // allow re-uploading same file
       })
       .catch(err => {
-        alert('Error parsing CSV: ' + err.message);
+        this.contactLoadingSkeleton.classList.add('hidden');
+        this.contactUploadArea.classList.remove('hidden');
+        this.modal.show({
+          title: 'Error Parsing CSV',
+          message: `Failed to parse CSV: ${err.message}`,
+          confirmText: 'OK',
+          cancelText: 'Cancel',
+          onConfirm: () => {}
+        });
         e.target.value = '';
       });
   }
@@ -286,7 +308,14 @@ class CallTracker {
     this.contactList.innerHTML = '';
 
     if (filtered.length === 0) {
-      this.contactList.innerHTML = '<p class="empty-state">No contacts match your search.</p>';
+      this.contactList.innerHTML = `
+        <div class="empty-state" style="min-height: 120px;">
+          <div class="empty-state-icon" style="font-size: 2rem; margin-bottom: 0.5rem;">
+            <i class="ph ph-magnifying-glass"></i>
+          </div>
+          <p style="font-size: 0.95rem;">No contacts match your search</p>
+        </div>
+      `;
       return;
     }
 
@@ -427,15 +456,35 @@ class CallTracker {
   }
 
   updateChart(hourlyData) {
-    Charts.initChart(this.hourlyChart, hourlyData);
+    // Show loading skeleton while chart renders
+    this.chartLoadingSkeleton.classList.remove('hidden');
+    this.chartContainer.classList.add('hidden');
+
+    // Use requestAnimationFrame to ensure smooth loading state transition
+    requestAnimationFrame(() => {
+      Charts.initChart(this.hourlyChart, hourlyData);
+      // Hide loading skeleton after chart is rendered
+      this.chartLoadingSkeleton.classList.add('hidden');
+      this.chartContainer.classList.remove('hidden');
+    });
   }
 
   updateTable(hourlyData) {
-    this.tableBody.innerHTML = '';
-    hourlyData.forEach((count, hour) => {
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${hour.toString().padStart(2, '0')}:00</td><td>${count}</td>`;
-      this.tableBody.appendChild(row);
+    // Show loading skeleton while table renders
+    this.tableLoadingSkeleton.classList.remove('hidden');
+    this.tableContainer.classList.add('hidden');
+
+    // Use requestAnimationFrame to ensure smooth loading state transition
+    requestAnimationFrame(() => {
+      this.tableBody.innerHTML = '';
+      hourlyData.forEach((count, hour) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${hour.toString().padStart(2, '0')}:00</td><td>${count}</td>`;
+        this.tableBody.appendChild(row);
+      });
+      // Hide loading skeleton after table is rendered
+      this.tableLoadingSkeleton.classList.add('hidden');
+      this.tableContainer.classList.remove('hidden');
     });
   }
 
@@ -444,7 +493,15 @@ class CallTracker {
     this.callCountEl.textContent = `${sorted.length} call${sorted.length !== 1 ? 's' : ''}`;
 
     if (sorted.length === 0) {
-      this.callsList.innerHTML = '<p class="empty-state">No calls for this period.</p>';
+      this.callsList.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <i class="ph ph-phone-slash"></i>
+          </div>
+          <p>No calls logged yet</p>
+          <p class="empty-state-hint">Click "Log Call Now" to start tracking</p>
+        </div>
+      `;
       return;
     }
 
