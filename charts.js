@@ -7,6 +7,41 @@ const Charts = {
     if (hourlyChartInstance) hourlyChartInstance.destroy();
 
     const ctx = canvas.getContext('2d');
+
+    // Detect light mode preference
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    // Color values for both themes
+    let chartConfig;
+
+    if (isDarkMode) {
+      // Mocha (dark) theme colors
+      chartConfig = {
+        backgroundColor: 'rgba(203, 166, 247, 0.7)',  // mauve
+        borderColor: 'rgb(203, 166, 247)',
+        hoverBackgroundColor: 'rgba(180, 190, 254, 0.85)',  // lavender
+        tooltipBg: 'rgba(49, 50, 68, 0.97)',  // surface0
+        textColor: '#cdd6f4',  // text
+        labelColor: '#a6adc8',  // subtext0
+        gridColor: 'rgba(69, 71, 90, 0.5)',
+        gridColorLight: 'rgba(69, 71, 90, 0.3)',
+        borderColorLine: '#45475a'  // surface1
+      };
+    } else {
+      // Latte (light) theme colors
+      chartConfig = {
+        backgroundColor: 'rgba(30, 102, 245, 0.7)',  // blue
+        borderColor: 'rgb(30, 102, 245)',
+        hoverBackgroundColor: 'rgba(30, 102, 245, 0.85)',
+        tooltipBg: 'rgba(232, 233, 237, 0.97)',  // surface0
+        textColor: '#4c4f69',  // text (dark)
+        labelColor: '#4c4f69',  // text (dark for WCAG AA compliance)
+        gridColor: 'rgba(205, 209, 220, 0.5)',  // surface2
+        gridColorLight: 'rgba(205, 209, 220, 0.3)',
+        borderColorLine: '#dce1e8'  // surface1
+      };
+    }
+
     hourlyChartInstance = new Chart(ctx, {
       type: 'bar',
       data: {
@@ -14,11 +49,11 @@ const Charts = {
         datasets: [{
           label: 'Calls',
           data,
-          backgroundColor:     'rgba(203, 166, 247, 0.7)',  // mauve
-          borderColor:         'rgb(203, 166, 247)',
+          backgroundColor: chartConfig.backgroundColor,
+          borderColor: chartConfig.borderColor,
           borderWidth: 1,
           borderRadius: 4,
-          hoverBackgroundColor: 'rgba(180, 190, 254, 0.85)' // lavender on hover
+          hoverBackgroundColor: chartConfig.hoverBackgroundColor
         }]
       },
       options: {
@@ -27,9 +62,9 @@ const Charts = {
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: 'rgba(49, 50, 68, 0.97)',  // surface0
-            titleColor: '#cdd6f4',
-            bodyColor:  '#cdd6f4',
+            backgroundColor: chartConfig.tooltipBg,
+            titleColor: chartConfig.textColor,
+            bodyColor: chartConfig.textColor,
             padding: 12,
             displayColors: false,
             callbacks: {
@@ -40,16 +75,16 @@ const Charts = {
         scales: {
           y: {
             beginAtZero: true,
-            ticks:  { stepSize: 1, color: '#a6adc8' },
-            title:  { display: true, text: 'Number of Calls', color: '#a6adc8' },
-            grid:   { color: 'rgba(69, 71, 90, 0.5)' },
-            border: { color: '#45475a' }
+            ticks: { stepSize: 1, color: chartConfig.labelColor },
+            title: { display: true, text: 'Number of Calls', color: chartConfig.labelColor },
+            grid: { color: chartConfig.gridColor },
+            border: { color: chartConfig.borderColorLine }
           },
           x: {
-            ticks:  { color: '#a6adc8' },
-            title:  { display: true, text: 'Hour of Day', color: '#a6adc8' },
-            grid:   { color: 'rgba(69, 71, 90, 0.3)' },
-            border: { color: '#45475a' }
+            ticks: { color: chartConfig.labelColor },
+            title: { display: true, text: 'Hour of Day', color: chartConfig.labelColor },
+            grid: { color: chartConfig.gridColorLight },
+            border: { color: chartConfig.borderColorLine }
           }
         }
       }

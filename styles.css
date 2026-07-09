@@ -135,7 +135,7 @@ header h1 .ph { vertical-align: -0.125em; margin-right: 0.25em; }
   font-size: 1rem;
 }
 #sheetLabel:focus { outline: none; border-color: var(--mauve); box-shadow: 0 0 0 2px rgba(203,166,247,0.2); }
-#sheetLabel::placeholder { color: var(--overlay0); }
+#sheetLabel::placeholder { color: var(--subtext1); }
 
 /* ── Sections ───────────────────────────────────────── */
 section {
@@ -365,7 +365,7 @@ input[type="date"]:focus { outline: none; border-color: var(--blue); }
   color: var(--subtext0);
 }
 .contact-upload-area p { margin-bottom: 1rem; }
-.upload-hint { font-size: 0.8rem; color: var(--overlay1); margin-top: 0.75rem; margin-bottom: 0 !important; }
+.upload-hint { font-size: 0.8rem; color: var(--subtext0); margin-top: 0.75rem; margin-bottom: 0 !important; }
 .contact-upload-area.hidden { display: none; }
 .contact-panel.hidden { display: none; }
 
@@ -388,7 +388,7 @@ input[type="date"]:focus { outline: none; border-color: var(--blue); }
   font-size: 0.95rem;
 }
 .contact-search:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 2px rgba(137,180,250,0.15); }
-.contact-search::placeholder { color: var(--overlay0); }
+.contact-search::placeholder { color: var(--subtext1); }
 
 .contact-list {
   max-height: 420px;
@@ -452,7 +452,7 @@ input[type="date"]:focus { outline: none; border-color: var(--blue); }
 .contact-call-count {
   font-size: 0.75rem;
   background: var(--surface2);
-  color: var(--subtext1);
+  color: var(--text);
   padding: 0.15rem 0.5rem;
   border-radius: 99px;
   white-space: nowrap;
@@ -601,7 +601,7 @@ footer {
 }
 
 .modal-input::placeholder {
-  color: var(--overlay0);
+  color: var(--subtext1);
 }
 
 .modal-buttons {
@@ -878,6 +878,101 @@ footer {
 .contact-upload-area p:first-of-type {
   color: var(--text);
   font-weight: 500;
+}
+
+/* ── WCAG AA Contrast Fixes (Light Mode) ──────────────── */
+@media (prefers-color-scheme: light) {
+  /* Header: Use white text for better contrast on colored gradient */
+  header {
+    color: #ffffff;
+  }
+
+  /* Buttons: Use white/light text on colored backgrounds for WCAG AA (4.5:1) */
+  .btn-primary {
+    color: #ffffff;
+  }
+  .btn-primary:hover {
+    color: #ffffff;
+  }
+
+  .btn-success {
+    color: #000000;
+  }
+  .btn-success:hover {
+    color: #000000;
+  }
+
+  .btn-danger {
+    color: #ffffff;
+  }
+  .btn-danger:hover {
+    color: #ffffff;
+  }
+
+  .btn-delete {
+    color: #ffffff;
+  }
+  .btn-delete:hover {
+    color: #ffffff;
+  }
+
+  .btn-log-contact {
+    color: #000000;
+  }
+  .btn-log-contact:hover {
+    color: #000000;
+  }
+
+  /* Input placeholders: Use darker text for visibility */
+  #sheetLabel::placeholder {
+    color: var(--text);
+  }
+
+  .contact-search::placeholder {
+    color: var(--text);
+  }
+
+  /* Labels and small text: Use text color for better contrast */
+  .stat-label {
+    color: var(--text);
+  }
+
+  .call-time-sub {
+    color: var(--text);
+  }
+
+  .call-contact-company {
+    color: var(--text);
+  }
+
+  .contact-meta {
+    color: var(--text);
+  }
+
+  .upload-hint {
+    color: var(--subtext0);
+  }
+
+  /* Table headers: Use darker text */
+  .data-table th {
+    color: var(--text);
+  }
+
+  /* Contact call count badge */
+  .contact-call-count {
+    color: var(--text);
+    background: var(--surface1);
+  }
+
+  /* Footer text */
+  footer {
+    color: var(--text);
+  }
+
+  /* Chart axis labels: Use darker text for visibility */
+  .chart-section {
+    /* Will override via Chart.js config if needed */
+  }
 }
 
 /* ── Scrollbars ─────────────────────────────────────── */
